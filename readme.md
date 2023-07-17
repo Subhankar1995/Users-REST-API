@@ -25,15 +25,28 @@ This project implements a RESTful API using Node.js, Express, and PostgreSQL. It
 
 2. API Endpoints:
 
-    POST /api/login: Authenticate user and generate a JWT token.
+    1. POST /api/users/login: 
+        - Description: Authenticate user and generate a JWT token.
+        - Request Body: 
+            {
+                "email": "user@example.com",
+                "password": "password123"
+            }
+        - Response:
+            - 200 OK:
+                {
+                    "id": "<userID>",
+                    "token": "<JWT Token>"
+                }
+            - 400 Bad Request: Invalid request body
+            - 404 Not Found: User not found
+            - 401 Unauthorized: Invalid password
+            - 503 Internal Server Error
 
-    POST /api/users: Create a new user.
-
-    GET /api/users/:id: Get details of an existing user.
-
-    PUT /api/users/:id: Update an existing user.
-    
-    DELETE /api/users/:id: Delete an existing user.
+    2. POST /api/users/create: Create a new user.
+    3. GET /api/users/:id: Get details of an existing user.
+    4. PUT /api/users/:id: Update an existing user.
+    5. DELETE /api/users/:id: Delete an existing user.
 
 3. Make API requests:
 
