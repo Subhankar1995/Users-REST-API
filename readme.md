@@ -35,18 +35,76 @@ This project implements a RESTful API using Node.js, Express, and PostgreSQL. It
         - Response:
             - 200 OK:
                 {
-                    "id": "<userID>",
-                    "token": "<JWT Token>"
+                    "id": "userID",
+                    "token": "JWT Token"
                 }
             - 400 Bad Request: Invalid request body
             - 404 Not Found: User not found
             - 401 Unauthorized: Invalid password
             - 503 Internal Server Error
 
-    2. POST /api/users/create: Create a new user.
-    3. GET /api/users/:id: Get details of an existing user.
+    2. POST /api/users/create:
+        - Description: Create a new user.
+        - Request Body: 
+            {
+                "name": userName,
+                "email": "user@example.com",
+                "password": "password123"
+            }
+        - Response:
+            - 200 OK:
+                {
+                    "id": "userId",
+                    "name": "userName",
+                    "email": "user@example.com"
+                }
+            - 400 Bad Request: Invalid request body
+            - 409 Conflict: User already exist
+            - 503 Internal Server Error
+
+    3. GET /api/users/:id:
+        - Description: Retrieve details of a user
+        - Request Header: Include JWT token in Authorization header
+        - Response Body:
+            - 200 OK:
+                {
+                    "id": "userId",
+                    "name": "userName",
+                    "email": "user@example.com"
+                }
+            - 401 Unauthorized: Invalid token
+            - 404 Not Found: User not found
+            - 503 Internal Server Error
+
     4. PUT /api/users/:id: Update an existing user.
+        - Description: Update user details like name, password. Based on request body param you can either update name, password or both parameter.
+        - Request Header: Include JWT token in Authorization header
+        - Request Body: 
+            {
+                "name": updated userName
+            }
+        - Response Body:
+            - 200 OK:
+                {
+                    "id": "userId",
+                    "name": "updated userName",
+                    "email": "user emailId"
+                }
+            - 401 Unauthorized: Invalid token
+            - 404 Not Found: User not found
+            - 503 Internal Server Error
+
     5. DELETE /api/users/:id: Delete an existing user.
+        - Description: Delete an existing user.
+        - Request Header: Include JWT token in Authorization header
+        - Response Body:
+            - 200 OK:
+                {
+                    "message": "deleted user"
+                }
+            - 401 Unauthorized: Invalid token
+            - 404 Not Found: User not found
+            - 503 Internal Server Error
 
 3. Make API requests:
 

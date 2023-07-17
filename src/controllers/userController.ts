@@ -10,18 +10,37 @@ import {
   deleteUserQuery,
   getUserQuery,
   loginUserQuery,
+  updateUserDetailsNameQuery,
+  updateUserDetailsPasswordQuery,
   updateUserDetailsQuery,
 } from "../db/queries";
 import { User } from "../interfaces/userInterface";
+import { QueryResult } from "pg";
 
 const jwtSecretKey = process.env.jwtSecretKey || "hidden";
 
-function validateRequestBody(request: Request, forLogin?: boolean) {
+function validateRequestBody(
+  request: Request,
+  forLogin?: boolean,
+  forUpdate?: boolean
+) {
   const schema = Joi.object({
     name: forLogin ? Joi.string().optional() : Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   });
+
+  if (forUpdate) {
+    const updateSchema = Joi.object({
+      name: Joi.string(),
+      password: Joi.string(),
+    })
+      .or("name", "password")
+      .required();
+
+    const { error } = updateSchema.validate(request.body);
+    return error;
+  }
 
   const { error } = schema.validate(request.body);
   return error;
@@ -105,21 +124,31 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   // validate request body
-  const error = validateRequestBody(req);
+  const error = validateRequestBody(req, undefined, true);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
   const id = req.params.id;
-  const hashedPassword = bcrypt.hashSync(password, 10);
   try {
-    const updatedResult = await pool.query(updateUserDetailsQuery, [
-      id,
-      name,
-      email,
-      hashedPassword,
-    ]);
-    if (updatedResult.rowCount === 0) {
+    let updatedResult: QueryResult<any>;
+    if (name && !password) {
+      updatedResult = await pool.query(updateUserDetailsNameQuery, [id, name]);
+    } else if (!name && password) {
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      updatedResult = await pool.query(updateUserDetailsPasswordQuery, [
+        id,
+        hashedPassword,
+      ]);
+    } else {
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      updatedResult = await pool.query(updateUserDetailsQuery, [
+        id,
+        name,
+        hashedPassword,
+      ]);
+    }
+    if (updatedResult && updatedResult.rowCount === 0) {
       return res.status(404).send("user not found!!");
     }
     const updatedUser: User = updatedResult.rows[0];
@@ -141,7 +170,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "User not found." });
     }
-    return res.send("deleted user");
+    return res.json({ message: "deleted user" });
   } catch (error) {
     return res.status(503).send("internal server error");
   }
