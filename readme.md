@@ -26,9 +26,13 @@ This project implements a RESTful API using Node.js, Express, and PostgreSQL. It
 2. API Endpoints:
 
     POST /api/login: Authenticate user and generate a JWT token.
+
     POST /api/users: Create a new user.
+
     GET /api/users/:id: Get details of an existing user.
+
     PUT /api/users/:id: Update an existing user.
+    
     DELETE /api/users/:id: Delete an existing user.
 
 3. Make API requests:
