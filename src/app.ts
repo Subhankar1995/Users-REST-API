@@ -1,4 +1,4 @@
-import express,{ Application, NextFunction, Request, Response } from "express";
+import express,{ Application, Request, Response } from "express";
 import userRouter from "./router/UserRouter";
 
 const app: Application = express();

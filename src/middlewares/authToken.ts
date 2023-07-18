@@ -3,8 +3,12 @@ import jwt from 'jsonwebtoken';
 
 const jwtSecretKey = process.env.jwtSecretKey || 'hidden'
 
+/**
+ * @description 
+ * This middelware function verify JWT token
+ * Token must be present in request header's Authorization
+ */
 export const authToken = (req: Request, res: Response, next: NextFunction) => {
-    console.log("authenticating token......");
     const token = req.header('Authorization');
 
     if (!token) {
@@ -13,7 +17,6 @@ export const authToken = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         jwt.verify(token, jwtSecretKey);
-        console.log("token is valid");
         next();
     } catch (error) {
         return res.status(401).json({ message: 'Invalid token.' });

@@ -19,11 +19,19 @@ import { QueryResult } from "pg";
 
 const jwtSecretKey = process.env.jwtSecretKey || "hidden";
 
+/**
+ * @description
+ * This function validates the request body based on uses cases.
+ * @param request
+ * @param forLogin
+ * @param forUpdate
+ * @returns error | undefined
+ */
 function validateRequestBody(
   request: Request,
   forLogin?: boolean,
   forUpdate?: boolean
-) {
+): Joi.ValidationError | undefined {
   const schema = Joi.object({
     name: forLogin ? Joi.string().optional() : Joi.string().required(),
     email: Joi.string().email().required(),
@@ -31,6 +39,7 @@ function validateRequestBody(
   });
 
   if (forUpdate) {
+    // Validation Schema for update logic
     const updateSchema = Joi.object({
       name: Joi.string(),
       password: Joi.string(),
@@ -46,6 +55,15 @@ function validateRequestBody(
   return error;
 }
 
+/**
+ * @description
+ * controller for login/signIn user. Request body must have email and password.
+ * On successful login its create a JWT token and send to client to validate subsequent request.
+ * This JWT token is valid for 1hr.
+ * @param req Incoming Request
+ * @param res response
+ * @returns
+ */
 export const signInUser = async (req: Request, res: Response) => {
   // validate request body
   const error = validateRequestBody(req, true);
@@ -71,6 +89,14 @@ export const signInUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @description
+ * This is controller function for creating user.
+ * Request body must contain name, email and password
+ * @param req Incoming request
+ * @param res Response
+ * @returns
+ */
 export const createUser = async (req: Request, res: Response) => {
   // validate request body
   const error = validateRequestBody(req);
@@ -104,6 +130,13 @@ export const createUser = async (req: Request, res: Response) => {
   res.status(201).json({ id, name, email });
 };
 
+/**
+ * @description
+ * This is the controller function for getting user details.
+ * @param req Incoming Request
+ * @param res Response
+ * @returns
+ */
 export const getUser = async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
@@ -122,6 +155,15 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @description
+ * This is the controller function for updating user details.
+ * User can update name, password or both (name and password).
+ * Updated value must be present in incoming request body.
+ * @param req Incoming Request
+ * @param res Response
+ * @returns
+ */
 export const updateUser = async (req: Request, res: Response) => {
   // validate request body
   const error = validateRequestBody(req, undefined, true);
@@ -163,6 +205,13 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @description
+ * This is the controller function for deleting a user.
+ * @param req Incoming Request
+ * @param res Response
+ * @returns
+ */
 export const deleteUser = async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
