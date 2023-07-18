@@ -106,7 +106,7 @@ This project implements a RESTful API using Node.js, Express, and PostgreSQL. It
             - 404 Not Found: User not found
             - 503 Internal Server Error
 
-3. Make API requests:
+3. Testing API:
 
-    You can use tools like curl, Postman, or any other API testing tool to make requests to the API endpoints mentioned above.
+    You can use tools like curl, Postman to make requests to the API endpoints mentioned above.
     For protected routes (e.g., /api/users/:id), include the JWT token in the Authorization header of the request. You can obtain the token by making a successful login request.
